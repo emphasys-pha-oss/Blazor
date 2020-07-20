@@ -1,0 +1,58 @@
+﻿
+@layout AuthenticationLayout
+@page "/signup"
+@using Blazor_HelloWorld.Data.Model
+@using Blazor_HelloWorld.Data.Implementation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+<EditForm Model="@Model" OnValidSubmit="@ValidateUser">
+    <div>
+        <br /><br /><br /><br /><br />
+    </div>
+    <div>
+        <h3 style="font-weight:bold;color:purple">Blazor Login</h3>
+    </div>
+    <div>
+        <br />
+    </div>
+    <div class="col-12 row">
+        <InputText class="form-control col-12" @bind-Value="Model.Email" placeholder="Email Address" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <input type="password" class="form-control col-12" @bind="Model.Password" placeholder="Password" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <input type="password" class="form-control col-12" @bind="Model.ConfirmPassword" placeholder="Confirm Password" />
+    </div>
+    <br />
+    <div class="col-12 row">
+        <span class="col-12"></span>
+        <input type="submit" class="form-control btn btn-primary col-6" value="Signup" />
+    </div>
+</EditForm>
+
+@code {
+
+    public User Model { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        Model = new User();
+        return base.OnInitializedAsync();
+    }
+
+    private async Task<bool> ValidateUser()
+    {
+        (AuthenticationStateProvider as CustomAuthenticationStateProvider).MarkUserAsAuthenticated(Model.Email);
+        NavigationManager.NavigateTo("/");
+
+        await sessionStorage.SetItemAsync("emailAddress", Model.Email);
+
+        return await Task.FromResult(true);
+    }
+}

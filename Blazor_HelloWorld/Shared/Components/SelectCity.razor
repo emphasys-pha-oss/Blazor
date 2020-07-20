@@ -1,0 +1,35 @@
+﻿@inject IJSRuntime JSRuntime
+<MatSelect @bind-Value="CurrentCity" Label="Select a City...">
+    @if (Cities != null)
+    {
+        <MatOptionString></MatOptionString>
+        @foreach (var city in Cities)
+        {
+            <MatOptionString value="@city">@city</MatOptionString>
+        }
+    }
+</MatSelect>
+
+@code {
+
+    [Parameter]
+    public string CurrentCity { get; set; }
+
+    public string[] Cities;
+
+    /// <summary>
+    /// This function gets executed after Render has been completed.
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && Cities == null)
+        {
+            Cities = await JSRuntime.InvokeAsync<string[]>("GetCities");
+
+            // notify the change to the UI, potentially causing re-render.
+            StateHasChanged();
+        }
+    }
+}
